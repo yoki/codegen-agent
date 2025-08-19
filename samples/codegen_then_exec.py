@@ -14,10 +14,10 @@ from codegen_agent.core.execution.runner import execute
 
 
 async def main() -> int:
-    if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY_FOR_DATA_AGENCY")):
-        raise SystemExit("Set GEMINI_API_KEY (or GEMINI_API_KEY_FOR_DATA_AGENCY)")
+    if not (os.environ.get("GEMINI_API_KEY_FOR_CODEGEN_AGENT")):
+        raise SystemExit("Set GEMINI_API_KEY_FOR_CODEGEN_AGENT")
 
-    client = create_client(LLMModels.GEMINI25_FLASH)
+    client = create_client(model=LLMModels.GEMINI25_FLASH)
 
     # Variables to pass
     s = pd.Series([10, 20, 30, 40], name="x")

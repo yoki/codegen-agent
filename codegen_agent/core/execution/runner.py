@@ -6,7 +6,6 @@ import pickle
 from pathlib import Path
 from typing import Dict, Any, Set
 
-# Optional pandas for DataFrame-friendly pickling
 import pandas as pd
 
 

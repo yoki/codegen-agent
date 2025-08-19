@@ -2,14 +2,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 
-# Optional: provide a lightweight fallback for AssistantMessage to avoid hard dependency
-try:
-    from autogen_core.models import AssistantMessage  # type: ignore
-except Exception:  # pragma: no cover
-
-    class AssistantMessage(BaseModel):  # type: ignore
-        content: str
-        source: str = "assistant"
+from autogen_core.models import AssistantMessage
 
 
 class CodeGenerationRequest(BaseModel):

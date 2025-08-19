@@ -4,7 +4,11 @@ RUN pip install --no-cache-dir \
     pandas \
     numpy \
     matplotlib \
-    seaborn
+    seaborn \
+    scikit-learn \
+    scipy \
+    statsmodels \
+    openpyxl 
 
 ENV MPLCONFIGDIR=/tmp
 WORKDIR /work

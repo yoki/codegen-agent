@@ -182,7 +182,7 @@ class FullLogChatClientCache(ChatCompletionCache):
 def create_client(*args, model: LLMModels = LLMModels.GEMINI25_FLASH, **kwargs) -> FullLogChatClientCache:
     """Returns a FullLogChatClientCache instance with the configured model client and cache store."""
     model_client = ModelClientFactory.create_client(model)
-    return FullLogChatClientCache(model_client, cache_store, *args, **kwargs)
+    return FullLogChatClientCache(*args, client=model_client, store=cache_store, **kwargs)
 
 
 async def sample():

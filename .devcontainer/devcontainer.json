@@ -10,10 +10,9 @@
         // GEMINI_API key
         "type=bind,source=/mnt/c/mydata/workspace/configs/secrets/codegen_agent,target=/secrets/codegen_agent,readonly"
     ],
-    "postCreateCommand": "uv pip install --system -e .[jupyter] && service docker start",
-    "runArgs": [
-        "--privileged"
-    ], // Required for Docker-in-Docker 
+    "postCreateCommand": "uv pip install --system -e .[jupyter]",
+    // "postStartCommand": "bash -l -c start-docker",
+    "privileged": true,
     "containerEnv": {
         "CODEGEN_AGENT_STATE": "/workspaces/${localWorkspaceFolderBasename}/codegen_agent_state"
     },

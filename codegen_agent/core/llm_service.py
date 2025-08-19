@@ -15,6 +15,7 @@ Notes on prompt strings:
 import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Protocol, Type
+from autogen_core.models import UserMessage, SystemMessage, AssistantMessage
 
 import pandas as pd
 
@@ -25,7 +26,7 @@ from .models import (
     CodeAssessmentResult,
     ExecutionAssessmentHistoryItem,
 )
-
+from .llm_client import FullLogChatClientCache
 # -----------------------------
 # Prompt templates (raw strings)
 # -----------------------------
@@ -128,14 +129,10 @@ Follow your debugging protocol precisely to generate the corrected, complete Pyt
 # -----------------------------
 
 
-class LLMClient(Protocol):
-    async def create(self, *, messages: List[dict], json_output: Type) -> Any: ...
-
-
 class LLMServiceBase:
     """Base class for LLM services, providing a client and data description utility."""
 
-    def __init__(self, client: LLMClient):
+    def __init__(self, client: FullLogChatClientCache):
         self.client = client
 
     def prepare_data_description(self, user_variables: Dict[str, Any]) -> str:
@@ -182,8 +179,8 @@ class CodeGenerationService(LLMServiceBase):
         )
         response = await self.client.create(
             messages=[
-                {"role": "system", "content": CODE_GENERATOR_SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
+                SystemMessage(content=CODE_GENERATOR_SYSTEM_PROMPT),
+                UserMessage(content=prompt, source="user"),
             ],
             json_output=CodeGenerationResult,
         )
@@ -221,17 +218,26 @@ class AssessmentService(LLMServiceBase):
             data_description=data_description,
         )
 
-        messages: List[dict] = [{"role": "system", "content": system_prompt}]
-        # Thread prior attempts into context
-        for item in previous_actions:
-            # Use only the textual content of the generated assistant message
-            try:
-                content = item.generate_agent_message().content  # type: ignore[attr-defined]
-            except Exception:
-                content = f"Plan:\n{item.plan}\n\nExecution Result:\n{item.execution_result.stdout}\n{item.execution_result.stderr}\n\nAnalysis:\n{item.assessment.analysis}"
-            messages.append({"role": "assistant", "content": content})
+        messages = [
+            SystemMessage(content=system_prompt),
+        ]
+        messages += [item.generate_agent_message() for item in previous_actions]
 
-        messages.append({"role": "user", "content": prompt})
+        messages += [UserMessage(content=prompt, source="user")]
+
+        # messages = [
+        #     SystemMessage(content=system_prompt),
+        # ]
+        # # Thread prior attempts into context
+        # for item in previous_actions:
+        #     # Use only the textual content of the generated assistant message
+        #     try:
+        #         content = item.generate_agent_message().content  # type: ignore[attr-defined]
+        #     except Exception:
+        #         content = f"Plan:\n{item.plan}\n\nExecution Result:\n{item.execution_result.stdout}\n{item.execution_result.stderr}\n\nAnalysis:\n{item.assessment.analysis}"
+        #     messages.append({"role": "assistant", "content": content})
+
+        # messages.append({"role": "user", "content": prompt})
 
         response = await self.client.create(
             messages=messages,
