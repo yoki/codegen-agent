@@ -5,7 +5,7 @@
 from __future__ import annotations
 import pandas as pd
 import numpy as np
-from llm_analyze.core.execution.runner import execute
+from codegen_agent.core.execution.runner import execute
 
 
 def make_df(n: int = 50_000) -> pd.DataFrame:

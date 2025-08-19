@@ -7,10 +7,8 @@ from pathlib import Path
 from typing import Dict, Any, Set
 
 # Optional pandas for DataFrame-friendly pickling
-try:
-    import pandas as pd  # type: ignore
-except Exception:  # pragma: no cover
-    pd = None  # type: ignore
+import pandas as pd
+
 
 from ..models import ExecutionResult
 from .docker_runtime import DockerRuntime
@@ -39,12 +37,12 @@ def _save_var(path: Path, value: Any) -> None:
         pickle.dump(value, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def execute(code: str, variables: Dict[str, Any], *, image: str = "llm-analyze-runner:py313") -> ExecutionResult:
+def execute(code: str, variables: Dict[str, Any], *, image: str = "codegen-agent-runner:py313") -> ExecutionResult:
     """Execute code inside a disposable Docker container with RO inputs and RW outputs.
 
     Returns ExecutionResult(stdout, stderr, returncode).
     """
-    tmp_root = Path(tempfile.mkdtemp(prefix="llm_analyze_"))
+    tmp_root = Path(tempfile.mkdtemp(prefix="codegen_agent_"))
     inputs = tmp_root / "inputs"
     outputs = tmp_root / "outputs"
     vars_dir = inputs / "vars"

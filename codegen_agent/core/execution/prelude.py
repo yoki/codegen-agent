@@ -5,11 +5,7 @@ import sys
 import glob
 import pickle
 
-# Optional import: if pandas exists in the image, use it for pickles written by pandas
-try:
-    import pandas as pd  # type: ignore
-except Exception:
-    pd = None  # type: ignore
+import pandas as pd
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp")
 

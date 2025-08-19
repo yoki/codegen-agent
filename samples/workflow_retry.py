@@ -9,15 +9,15 @@ import asyncio
 import json
 from types import SimpleNamespace
 
-from llm_analyze.core.models import (
+from codegen_agent.core.models import (
     CodeGenerationRequest,
     CodeGenerationResult,
     CodeAssessmentResult,
     ExecutionResult,
     ExecutionAssessmentHistoryItem,
 )
-from llm_analyze.core.llm_service import CodeGenerationService, AssessmentService
-from llm_analyze.core.workflow.agent_workflow import AgentWorkflow
+from codegen_agent.core.llm_service import CodeGenerationService, AssessmentService
+from codegen_agent.core.workflow.agent_workflow import AgentWorkflow
 
 
 # ----------------------------

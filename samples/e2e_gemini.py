@@ -7,10 +7,10 @@ import asyncio
 import os
 import pandas as pd
 
-from llm_analyze.core.clients.llm import create_client, LLMModels
-from llm_analyze.core.models import CodeGenerationRequest
-from llm_analyze.core.llm_service import CodeGenerationService, AssessmentService
-from llm_analyze.core.workflow.agent_workflow import AgentWorkflow
+from codegen_agent.core.clients.llm import create_client, LLMModels
+from codegen_agent.core.models import CodeGenerationRequest
+from codegen_agent.core.llm_service import CodeGenerationService, AssessmentService
+from codegen_agent.core.workflow.agent_workflow import AgentWorkflow
 
 
 async def main() -> int:
