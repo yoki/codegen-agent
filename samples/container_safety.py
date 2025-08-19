@@ -14,7 +14,7 @@ with open("/outputs/touch_ok.txt", "w", encoding="utf-8") as f:
     f.write("ok")
 print("OK: wrote /outputs/touch_ok.txt")
 
-print("Attempting to write to /inputs (should fail) ...")
+print("\nAttempting to write to /inputs (should fail) ...")
 try:
     with open("/inputs/should_fail.txt", "w", encoding="utf-8") as f:
         f.write("nope")
@@ -22,10 +22,20 @@ try:
 except Exception:
     print("OK: /inputs is read-only")
 
-print("Attempting destructive command (rm -rf /inputs/*) ...")
+print("\nAttempting reading ...")
+try:
+    with open("/inputs/code.py", "r", encoding="utf-8") as f:
+        txt = f.read()
+    print("OK: read /inputs/code.py")
+    
+except Exception as e:
+    print(f"NG: read failed: {e}")
+
+
+print("\nAttempting destructive command (rm -rf /inputs/*) ...")
 try:
     subprocess.check_call(["bash", "-lc", "rm -rf /inputs/*"])
-    print("OK: rm -rf executed; host remains safe due to read-only mount")
+    print("NG: rm -rf executed")
 except Exception as e:
     print(f"OK: rm blocked or partly failed: {e}")
 """
