@@ -1,4 +1,4 @@
-# llm_analyze/core/llm_service.py
+# codegen_agent/core/llm_service.py
 from __future__ import annotations
 
 """
@@ -30,7 +30,7 @@ from .models import (
 # Prompt templates (raw strings)
 # -----------------------------
 
-CODE_GENERATOR_SYSTEM_PROMPT = r"""
+CODE_GENERATOR_SYSTEM_PROMPT = """
 You are an expert-level Python data analysis agent. Your purpose is to write, debug, and refine Python code to answer user requests using a provided dataset.
 
 ## **Core Directives**
@@ -46,7 +46,7 @@ If you are provided with an `error traceback` (`stderr`), you **MUST** follow th
 3.  **Corrected Code:** Provide the complete, new block of code.
 """
 
-OUTPUT_ASSESMENT_SYSTEM_PROMPT = r"""
+OUTPUT_ASSESMENT_SYSTEM_PROMPT = """
 You are an expert-level code assessment agent. Your purpose is to meticulously analyze the results of executed Python code to determine if it successfully fulfilled the original user's request.
 
 ## **Core Directives**
@@ -55,7 +55,7 @@ You are an expert-level code assessment agent. Your purpose is to meticulously a
 * **Follow a Strict Schema:** Your entire output must be a single JSON object that strictly conforms to the provided `CodeAssessmentResult` schema. Do not output any other text or explanation outside of this JSON structure.
 """
 
-OUTPUT_ASSESSMENT_PROMPT_TEMPLATE = r"""
+OUTPUT_ASSESSMENT_PROMPT_TEMPLATE = """
 Your task is to assess the result of a code execution against the original user request and conversation history. Based on your assessment, you will determine if the request was fulfilled and, if not, generate a plan and new code for the next attempt.
 
 ## **Context**
@@ -87,7 +87,7 @@ Analyze the execution artifacts in the context of the user request and history
 Your output **MUST** be a JSON object that conforms to the `CodeAssessmentResult` schema below.
 """
 
-CODE_GENERATION_PROMPT_TEMPLATE = r"""
+CODE_GENERATION_PROMPT_TEMPLATE = """
 **User Request:** "Today is {today}. {request_text}"
 
 **Available Data:**
@@ -96,7 +96,7 @@ CODE_GENERATION_PROMPT_TEMPLATE = r"""
 Generate the Python code to fulfill the request.
 """
 
-CODE_REGENERATION_PROMPT_TEMPLATE = r"""
+CODE_REGENERATION_PROMPT_TEMPLATE = """
 Your previous code attempt failed. Analyze the error and generate a new version of the code.
 
 # **User Request:** "Today is {today}. {request_text}"
