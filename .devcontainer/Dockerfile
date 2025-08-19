@@ -13,7 +13,10 @@ RUN apt-get update && apt-get install -y locales-all
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
+# make docker socket available in the container
+RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
 
+# uv is faster when rebuilding the container
 RUN python -m pip install -U pip setuptools wheel uv
 
 
@@ -21,13 +24,13 @@ RUN python -m pip install -U pip setuptools wheel uv
 # # create vscode-server folder for persistence of vs code extensions across reloads
 RUN mkdir -p /root/.vscode-server 
 
-# USER vscode
 # set up git (line ending and user info)
 RUN git config --global user.name "Yoki" \
     && git config --global user.email "yotokyos@gmail.com" \
     && git config --global core.autocrlf input \
     && git config --global core.eol lf
 
+# nicer terminal
 COPY .devcontainer/.bashrc /root/.bashrc
 COPY .devcontainer/.bash_history /root/.bash_history
 

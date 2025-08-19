@@ -5,11 +5,15 @@
         "context": ".."
     },
     "mounts": [
-        "type=volume,source=vscode-${localWorkspaceFolderBasename}-server,target=/root/.vscode-server" // To avoid re-installation of VS code extensions for every reload
+        // To avoid re-installation of VS code extensions for every reload
+        "type=volume,source=vscode-${localWorkspaceFolderBasename}-server,target=/root/.vscode-server"
     ],
-    "postCreateCommand": "uv pip install --system -e .[jupyter]",
+    "postCreateCommand": "uv pip install --system -e .[jupyter] && service docker start",
     // "containerUser": "vscode",
     // "remoteUser": "vscode",
+    "runArgs": [
+        "--privileged"
+    ], // Required for Docker-in-Docker 
     // "updateRemoteUserUID": false,
     "customizations": {
         "vscode": {

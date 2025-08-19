@@ -1,5 +1,7 @@
-cd /workspaces/synapse/
-uv pip compile requirements.in -o requirements.txt
-uv pip sync requirements.txt --system
-jupyter lab --NotebookApp.token='' --NotebookApp.password='' --notebook-dir='/workspaces/synapse/working'
-pip install -e /workspaces/synapse/src/data-agency
+cd /workspaces/codegen-agent/
+python samples/container_safety.py
+python samples/e2e_gemini.py
+python samples/codegen_then_exec.py
+python samples/large_variable_passthrough.py
+python samples/workflow_retry.py
+
