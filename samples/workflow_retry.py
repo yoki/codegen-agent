@@ -14,10 +14,9 @@ from codegen_agent.core.models import (
     CodeGenerationResult,
     CodeAssessmentResult,
     ExecutionResult,
-    ExecutionAssessmentHistoryItem,
 )
 from codegen_agent.core.llm_service import CodeGenerationService, AssessmentService
-from codegen_agent.core.workflow.agent_workflow import AgentWorkflow
+from codegen_agent.core.workflow import AgentWorkflow
 
 
 # ----------------------------
@@ -69,36 +68,6 @@ class DeterministicLLM:
 
 
 # ----------------------------
-# Minimal UI (no IPython)
-# ----------------------------
-class PrintUI:
-    def show_generated_code(self, code: str, explanation=None, trial_number=None):
-        tag = f"(Attempt {trial_number})" if trial_number else ""
-        print("\n=== Generated Code", tag, "===\n", code, sep="")
-
-    def show_results(self, execution_result: ExecutionResult, trial_number=None):
-        tag = f"(Attempt {trial_number})" if trial_number else ""
-        print("\n=== Execution Results", tag, "===\nSTDOUT:\n", execution_result.stdout, sep="")
-        if execution_result.stderr.strip():
-            print("STDERR:\n", execution_result.stderr, sep="")
-
-    def show_assessment(self, assessment: CodeAssessmentResult):
-        print("\n=== Assessment ===")
-        print("Success:", assessment.success)
-        print("Should Retry:", assessment.should_retry)
-        if assessment.analysis:
-            print("Analysis:", assessment.analysis)
-        if assessment.plan:
-            print("Plan:", assessment.plan)
-
-    def save_to_notebook(self, request: CodeGenerationRequest, code: str):
-        print("\n[Saved] Final code prepared for notebook/cell:\n", code, sep="")
-
-    def clean_code_section(self):
-        pass
-
-
-# ----------------------------
 # Main: run the workflow
 # ----------------------------
 async def main() -> int:
@@ -109,13 +78,11 @@ async def main() -> int:
     )
 
     client = DeterministicLLM()
-    ui = PrintUI()
 
     wf = AgentWorkflow(
         request=request,
-        codegen=CodeGenerationService(client),
-        assessor=AssessmentService(client),
-        ui=ui,
+        codegen=CodeGenerationService(client),  # type: ignore
+        assessor=AssessmentService(client),  # type: ignore
         max_code_generation=3,
     )
 

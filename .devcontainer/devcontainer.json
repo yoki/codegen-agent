@@ -27,12 +27,6 @@
                 "files.eol": "\n",
                 "remote.containers.forwardGpg": false, // saves time
                 "remote.containers.forwardX11": false, // saves time
-                // Python built-ins disabled
-                "python.linting.enabled": false,
-                "python.formatting.provider": "none",
-                "python.linting.pylintEnabled": false,
-                "python.linting.flake8Enabled": false,
-                "python.linting.mypyEnabled": false,
                 "[python]": {
                     "editor.defaultFormatter": "charliermarsh.ruff",
                     "editor.formatOnSave": true,

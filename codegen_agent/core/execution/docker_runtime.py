@@ -27,7 +27,7 @@ class DockerRuntime:
         # Fast path: image already present.
         insp = self._run(["docker", "image", "inspect", self.image])
         if insp.returncode == 0:
-            print(f"Docker image '{self.image}' already exists, using cached version")
+            # print(f"Docker image '{self.image}' already exists, using cached version")
             return
 
         print(f"Docker image '{self.image}' not found, building...")
