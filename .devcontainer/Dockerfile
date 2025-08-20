@@ -22,8 +22,6 @@ RUN mkdir -p /etc/docker && \
 # uv is faster when rebuilding the container
 RUN python -m pip install -U pip setuptools wheel uv
 
-
-
 # # create vscode-server folder for persistence of vs code extensions across reloads
 RUN mkdir -p /root/.vscode-server 
 
@@ -32,8 +30,6 @@ RUN git config --global user.name "Yoki" \
     && git config --global user.email "yotokyos@gmail.com" \
     && git config --global core.autocrlf input \
     && git config --global core.eol lf
-
-
 
 # Create the idempotent Docker startup command
 RUN echo '#!/bin/sh\n\
@@ -49,8 +45,6 @@ if ! docker ps > /dev/null 2>&1; then\n\
     done\n\
 fi' > /usr/local/bin/start-docker \
 && chmod +x /usr/local/bin/start-docker
-
-
 
 # nicer terminal
 COPY .devcontainer/.bashrc /root/.bashrc

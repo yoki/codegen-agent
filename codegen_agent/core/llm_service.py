@@ -60,7 +60,7 @@ OUTPUT_ASSESSMENT_PROMPT_TEMPLATE = """
 Your task is to assess the result of a code execution against the original user request and conversation history. Based on your assessment, you will determine if the request was fulfilled and, if not, generate a plan and new code for the next attempt.
 
 ## **Context**
-* **User Request:** "Today is {today}. {request_text}"
+* **User Request:** "{request_text}"
 
 ## **Execution Artifacts**
 ```python
@@ -80,12 +80,12 @@ Your task is to assess the result of a code execution against the original user 
 **Available Data:**
 {data_description}
 
+  * **Current date** :{today}.
+
 
 ## **Your Task**
 
-Analyze the execution artifacts in the context of the user request and history
-
-Your output **MUST** be a JSON object that conforms to the `CodeAssessmentResult` schema below.
+Analyze the execution artifacts in the context of the user request and history. If the user request was not fulfilled, generate a plan and new code for the next attempt.
 """
 
 CODE_GENERATION_PROMPT_TEMPLATE = """

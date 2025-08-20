@@ -50,7 +50,7 @@ class DisplayService:
             handle = display(Markdown(md), display_id="execution_results")
             self._display_handles["execution_results"] = handle
 
-    def save_to_notebook(self, request: CodeGenerationRequest, code: str):
+    def process_final_output(self, request: CodeGenerationRequest, code: str):
         if self.ipython_shell is not None:
             text = request.request_text.replace("\n", " ")
             header = f"# User request: {text}\n\n"

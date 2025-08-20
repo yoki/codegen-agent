@@ -26,8 +26,7 @@ class NotebookAgent:
         ui = DisplayService()
         wf = AgentWorkflow(
             request=req,
-            codegen=CodeGenerationService(self.client),
-            assessor=AssessmentService(self.client),
+            client=self.client,
             ui=ui,
             max_code_generation=self.MAX_CODE_GENERATION,
         )

@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import List, Optional, Dict, Any
+from typing import List
 
 from .models import (
     CodeGenerationRequest,
@@ -9,59 +8,9 @@ from .models import (
     ExecutionAssessmentHistoryItem,
 )
 from .llm_service import CodeGenerationService, AssessmentService
+from .llm_client import FullLogChatClientCache
 from .execution.runner import execute as sandbox_execute
-from typing import Protocol, Optional
-
-
-class UI(Protocol):
-    def show_generated_code(
-        self, code: str, explanation: Optional[str] = None, trial_number: Optional[int] = None
-    ): ...
-    def show_results(self, execution_result: ExecutionResult, trial_number: Optional[int] = None): ...
-    def show_assessment(self, assessment: CodeAssessmentResult): ...
-    def save_to_notebook(self, request: CodeGenerationRequest, code: str): ...
-    def clean_code_section(self): ...
-
-
-class ConsoleUI:
-    def show_generated_code(self, code: str, explanation: Optional[str] = None, trial_number: Optional[int] = None):
-        content = []
-        if explanation:
-            content.append(f"**Code Explanation:**\n\n{explanation}")
-        title = "**Generated Code:**" if not trial_number else f"**Generated Code (Attempt {trial_number}):**"
-        content.append(title)
-        content.append(f"```python\n{code}\n```")
-        print("\n".join(content))
-        print()
-
-    def show_results(self, execution_result: ExecutionResult, trial_number: Optional[int] = None):
-        title = "**Execution Results:**" if not trial_number else f"**Execution Results (Attempt {trial_number}):**"
-        content = [title]
-        stdout = execution_result.stdout
-        if len(stdout) > 1000:
-            stdout = stdout[:1000] + "\n... (output truncated)"
-        content.append(f"```\n{stdout}\n```")
-        if execution_result.stderr:
-            content.append(f"```stderr\n{execution_result.stderr}\n```")
-        print("\n".join(content))
-        print()
-
-    def show_assessment(self, assessment: CodeAssessmentResult):
-        if assessment.success:
-            print("**Code Assessment:** The generated code meets the requirements.")
-        else:
-            print(assessment.to_markdown())
-        print()
-
-    def save_to_notebook(self, request: CodeGenerationRequest, code: str):
-        text = request.request_text.replace("\n", " ")
-        header = f"# User request: {text}\n\n"
-        print("*Code has been saved:*")
-        print(header + code)
-        print()
-
-    def clean_code_section(self):
-        pass
+from .workflow_ui import UI, ConsoleUI
 
 
 class AgentWorkflow:
@@ -69,16 +18,15 @@ class AgentWorkflow:
 
     def __init__(
         self,
+        client: FullLogChatClientCache,
         request: CodeGenerationRequest,
         *,
-        codegen: CodeGenerationService,
-        assessor: AssessmentService,
         ui: UI = ConsoleUI(),
         max_code_generation: int = 3,
     ):
         self.request = request
-        self.codegen = codegen
-        self.assessor = assessor
+        self.codegen = CodeGenerationService(client)
+        self.assessor = AssessmentService(client)
         self.ui = ui
         self.max_code_generation = max_code_generation
         self.code_generation_count = 0
@@ -100,13 +48,13 @@ class AgentWorkflow:
             self.execution_result = sandbox_execute(self.current_code, self.request.user_variables)
             self.ui.show_results(self.execution_result, trial_number=self.code_generation_count + 1)
 
-            # Assess
-            self.code_generation_count += 1
+            # Assess and regenerate if needed
             orig_plan = self.assessment.plan
             self.assessment = await self.assessor.assess_code_output(
                 self.request, self.execution_result, self.current_code, self.history
             )
             self.ui.show_assessment(self.assessment)
+            self.code_generation_count += 1
 
             self.history.append(
                 ExecutionAssessmentHistoryItem(
@@ -118,7 +66,7 @@ class AgentWorkflow:
             )
 
             if self.assessment.success:
-                self.ui.save_to_notebook(self.request, self.current_code)
+                self.ui.process_final_output(self.request, self.current_code)
                 self.ui.clean_code_section()
                 return
 
@@ -128,5 +76,3 @@ class AgentWorkflow:
             if self.assessment.should_retry and self.assessment.code:
                 self.current_code = self.assessment.code
                 continue
-
-                # If should_retry is False or no code provided, stop.

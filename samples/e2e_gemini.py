@@ -9,7 +9,6 @@ import pandas as pd
 
 from codegen_agent.core.llm_client import create_client, LLMModels
 from codegen_agent.core.models import CodeGenerationRequest
-from codegen_agent.core.llm_service import CodeGenerationService, AssessmentService
 from codegen_agent.core.workflow import AgentWorkflow
 
 
@@ -31,12 +30,7 @@ async def main() -> int:
     )
 
     request = CodeGenerationRequest(request_text=req_text, user_variables=variables)
-    workflow = AgentWorkflow(
-        request=request,
-        codegen=CodeGenerationService(client),
-        assessor=AssessmentService(client),
-        max_code_generation=3,
-    )
+    workflow = AgentWorkflow(request=request, client=client, max_code_generation=3)
 
     await workflow.run()
     print("[OK] sample_e2e_gemini finished")

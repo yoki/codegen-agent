@@ -81,8 +81,7 @@ async def main() -> int:
 
     wf = AgentWorkflow(
         request=request,
-        codegen=CodeGenerationService(client),  # type: ignore
-        assessor=AssessmentService(client),  # type: ignore
+        client=client,  # type: ignore
         max_code_generation=3,
     )
 
