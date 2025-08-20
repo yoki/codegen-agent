@@ -49,7 +49,7 @@ def _state_path() -> Path:
 STATE_PATH = _state_path()
 LOG_PATH = STATE_PATH / "logs"
 CACHE_PATH = STATE_PATH / "cache"
-GEN_CODES_PATH = STATE_PATH / "gen_codes"
+CONTAINER_IO_PATH = STATE_PATH / "generated"
 
-for _p in (STATE_PATH, LOG_PATH, CACHE_PATH, GEN_CODES_PATH):
+for _p in (STATE_PATH, LOG_PATH, CACHE_PATH, CONTAINER_IO_PATH):
     _p.mkdir(exist_ok=True)

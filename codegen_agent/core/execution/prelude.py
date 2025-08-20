@@ -9,7 +9,7 @@ import pandas as pd
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp")
 
-VARS_DIR = "/inputs/vars"
+VARS_DIR = "/inputs"
 CODE_PATH = "/inputs/code.py"
 
 

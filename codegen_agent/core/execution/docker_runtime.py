@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from typing import Optional
 import time
-from ..mypath_and_key import GEN_CODES_PATH
 
 
 class DockerRuntime:

@@ -10,5 +10,4 @@ RUN pip install --no-cache-dir \
     statsmodels \
     openpyxl 
 
-ENV MPLCONFIGDIR=/tmp
 WORKDIR /work
