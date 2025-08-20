@@ -2,7 +2,7 @@ import subprocess
 import os
 from pathlib import Path
 from typing import Optional
-
+import time
 from ..mypath_and_key import GEN_CODES_PATH
 
 
@@ -20,7 +20,24 @@ class DockerRuntime:
         return subprocess.run(cmd, capture_output=True, text=True)
 
     def ensure_docker(self) -> None:
-        subprocess.run("start-docker")
+        """Ensure Docker daemon is running, start it if necessary."""
+        # Check if Docker is already running
+        check_proc = self._run(["docker", "ps"])
+        if check_proc.returncode == 0:
+            return  # Docker is already running
+
+        print("Starting Docker daemon...")
+
+        with open("/var/log/dockerd.log", "w") as log_file:
+            subprocess.Popen(["dockerd"], stdout=log_file, stderr=subprocess.STDOUT, start_new_session=True)
+
+        timeout = 10
+        socket_path = Path("/var/run/docker.sock")
+        while not socket_path.exists():
+            if timeout <= 0:
+                raise RuntimeError("Docker daemon failed to start within 20 seconds")
+            time.sleep(1)
+            timeout -= 1
 
     def ensure_image(self, dockerfile: Optional[str] = None) -> None:
         self.ensure_docker()

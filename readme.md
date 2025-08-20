@@ -17,7 +17,7 @@ from codegen_agent.core.workflow import AgentWorkflow
 
 tips = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
 
-client = create_client(model=LLMModels.GEMINI25_FLASH)
+client = create_client(model=LLMModels.GEMINI25_PRO)
 
 request = CodeGenerationRequest(
     request_text="Calculate average tip percentage by day of week and time (lunch/dinner), create a pivot table, and visualize with a heatmap",
@@ -34,37 +34,16 @@ result = asyncio.run(workflow.run())
 pip install codegen-agent@git+https://github.com/yoki/codegen-agent.git
 ```
 
-After pip, it needs several setup as it uses docker container and LLM (Gemini) API, so it needs several setup. 
+Other than pip, docker container and LLM (Gemini) API setup is needed.
 
 ### Docker
-Docker must be installed, and damon should be active. Tested with docker installed in WSL, not in docker desptop. You also need idempotent start-docker command in WSL.
-
-```sh
-cat > ~/bin/start-docker <<'EOF'
-#!/bin/sh
-set -e
-if ! docker ps > /dev/null 2>&1; then
-    echo "Starting Docker daemon..."
-    nohup dockerd > /var/log/dockerd.log 2>&1 &
-    timeout=20
-    while [ ! -S /var/run/docker.sock ]; do
-        if [ "$timeout" -eq 0 ]; then exit 1; fi
-        sleep 1
-        timeout=$((timeout - 1))
-    done
-fi
-EOF
-
-chmod +x ~/bin/start-docker
-```
+Docker must be installed. Tested with docker installed in WSL, not in docker desptop. 
 
 To use in devcontainer, you should install official docker, not repository one, and use fuse-overlayfs (or overlay2). Default vfs is slow (as of Aug 2025). 
 ```dockerfile
 RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && rm get-docker.sh
 RUN mkdir -p /etc/docker && \
     echo '{\n  "storage-driver": "fuse-overlayfs"\n}' > /etc/docker/daemon.json
-
-RUN echo '#!/bin/sh\nif ! docker ps > /dev/null 2>&1; then\n    nohup dockerd > /var/log/dockerd.log 2>&1 &\n    sleep 5\nfi' > /usr/local/bin/start-docker && chmod +x /usr/local/bin/start-docker
 ```
 
 ### API key and other env vars
@@ -73,7 +52,6 @@ Create `.env` file:
 GEMINI_API_KEY_FOR_CODEGEN_AGENT=your_gemini_api_key_here
 ```
 
-
 **File locations (priority order):**
 1. `$CODEGEN_AGENT_DOTENV_PATH` (if set)
 2. `./env` (current directory)
@@ -81,15 +59,11 @@ GEMINI_API_KEY_FOR_CODEGEN_AGENT=your_gemini_api_key_here
 4. `~/.config/codegen-agent/.env` (Linux/WSL)
 5. `%LOCALAPPDATA%\codegen_agent\State\.env` (Windows)
 
-
 ```json
     "mounts": [
         "type=bind,source=/mnt/c/my-path-to-secret,target=/secrets/codegen_agent,readonly",
     ],
 ```
-
-
-
 
 
 ## Logs
@@ -160,10 +134,14 @@ plt.show()
 ```
 
 **Execution Results (Attempt 1):**
+
+STDOUT:
 ```
 
 ```
-```stderr
+
+STDERR:
+```
 Traceback (most recent call last):
   File "/inputs/prelude.py", line 58, in <module>
     run()
@@ -227,10 +205,14 @@ KeyError: 'Sun'
 
 
 **Execution Results (Attempt 2):**
+
+STDOUT:
 ```
 
 ```
-```stderr
+
+STDERR:
+```
 /inputs/code.py:16: FutureWarning: The default value of observed=False is deprecated and will change to observed=True in a future version of pandas. Specify observed=False to silence this warning and retain the current behavior
   pivot_table = tips_data.pivot_table(
 

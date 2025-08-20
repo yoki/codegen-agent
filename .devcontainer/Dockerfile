@@ -31,21 +31,6 @@ RUN git config --global user.name "Yoki" \
     && git config --global core.autocrlf input \
     && git config --global core.eol lf
 
-# Create the idempotent Docker startup command
-RUN echo '#!/bin/sh\n\
-set -e\n\
-if ! docker ps > /dev/null 2>&1; then\n\
-    echo "Starting Docker daemon..."\n\
-    nohup dockerd > /var/log/dockerd.log 2>&1 &\n\
-    timeout=20\n\
-    while [ ! -S /var/run/docker.sock ]; do\n\
-        if [ "$timeout" -eq 0 ]; then exit 1; fi\n\
-        sleep 1\n\
-        timeout=$((timeout - 1))\n\
-    done\n\
-fi' > /usr/local/bin/start-docker \
-&& chmod +x /usr/local/bin/start-docker
-
 # nicer terminal
 COPY .devcontainer/.bashrc /root/.bashrc
 COPY .devcontainer/.bash_history /root/.bash_history

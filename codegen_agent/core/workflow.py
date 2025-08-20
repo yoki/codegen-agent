@@ -37,7 +37,7 @@ class AgentWorkflow:
         self.assessment: CodeAssessmentResult = CodeAssessmentResult.empty_assessment()
         self.history: List[ExecutionAssessmentHistoryItem] = []
 
-    async def run(self) -> None:
+    async def run(self) -> str:
         # First generation
         self.code_result = await self.codegen.generate_code(self.request)
         self.current_code = self.code_result.code
@@ -68,10 +68,10 @@ class AgentWorkflow:
             if self.assessment.success:
                 self.ui.process_final_output(self.request, self.current_code)
                 self.ui.clean_code_section()
-                return
+                return self.current_code
 
             if self.code_generation_count >= self.max_code_generation:
-                return
+                return self.current_code
 
             if self.assessment.should_retry and self.assessment.code:
                 self.current_code = self.assessment.code

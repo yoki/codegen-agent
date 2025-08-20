@@ -25,5 +25,7 @@ color_prompt=yes
 PS1='\[\033[01;32m\]devcontainer\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 
-# run docker (defined in Dockerfile)
-start-docker
+# run docker
+if ! docker ps > /dev/null 2>&1; then
+    nohup dockerd > /var/log/dockerd.log 2>&1 &
+fi
