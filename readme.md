@@ -31,7 +31,7 @@ result = asyncio.run(workflow.run())
 
 ## Installation
 ```bash
-pip install codegen-agent@git+https://github.com/yoki/codegen-agent.git
+pip install codegen-agent@git+https://github.com/yoki/codegen-agent.git@v0.1.0
 ```
 
 Other than pip, docker container and LLM (Gemini) API setup is needed.
