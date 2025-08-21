@@ -20,8 +20,6 @@ dependencies = [
     "pandas",
     "dotenv",
     "autogen-ext[openai, diskcache]",
-    "lettuce_logger @ git+https://github.com/yoki/lettuce_logger.git@v0.1.2",
-    "mydevtools @ git+https://github.com/yoki/mydevtools.git@v0.1.2",
     "typing-extensions>=4.12.2"
 ]
 
