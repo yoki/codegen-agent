@@ -47,9 +47,16 @@ class ModelClientFactory:
 
     @staticmethod
     def _create_gemini_client(model: LLMModels):
+        api_key = os.environ.get("GEMINI_API_KEY_FOR_CODEGEN_AGENT")
+
+        if not api_key:
+            raise RuntimeError(
+                "GEMINI_API_KEY_FOR_CODEGEN_AGENT environment variable is not set. Set .env file following readme of codegen-agent."
+            )
+
         return OpenAIChatCompletionClient(
             model=model.value,
-            api_key=os.environ.get("GEMINI_API_KEY_FOR_CODEGEN_AGENT"),  # type: ignore
+            api_key=api_key,
             base_url=GOOGLE_OPENAI_BASE_URL,
             temperature=0.0,
             max_tokens=100000,
@@ -60,9 +67,15 @@ class ModelClientFactory:
 
     @staticmethod
     def _create_openai_client(model: LLMModels):
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "OPENAI_API_KEY environment variable is not set. Set .env file following readme of codegen-agent."
+            )
+
         return OpenAIChatCompletionClient(
             model=model.value,
-            api_key=os.environ.get("OPENAI_API_KEY"),  # type: ignore
+            api_key=api_key,
             temperature=0.0,
             max_tokens=100000,
             model_info=ModelInfo(
