@@ -51,5 +51,10 @@ LOG_PATH = STATE_PATH / "logs"
 CACHE_PATH = STATE_PATH / "cache"
 CONTAINER_IO_PATH = STATE_PATH / "generated"
 
+if not STATE_PATH.parent.exists():
+    raise FileNotFoundError(
+        f"Parent of state directoy does not exist. Create it and set .env file following readme of codegen-agent: {STATE_PATH}"
+    )
+
 for _p in (STATE_PATH, LOG_PATH, CACHE_PATH, CONTAINER_IO_PATH):
     _p.mkdir(exist_ok=True)
