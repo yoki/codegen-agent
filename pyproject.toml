@@ -32,3 +32,6 @@ include = ["codegen_agent*"]
 
 [tool.setuptools]
 package-dir = { "" = "." }
+
+[tool.setuptools.package-data]
+codegen_agent = ["sandbox/**/*"]
