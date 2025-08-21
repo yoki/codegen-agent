@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional
 import time
+import platform
 
 
 class DockerRuntime:
@@ -13,9 +14,13 @@ class DockerRuntime:
     def __init__(self, image: Optional[str] = None):
         # You can prebuild/pull an image and set CODEGEN_AGENT_RUNNER_IMAGE to skip builds.
         self.image = image or os.environ.get("CODEGEN_AGENT_RUNNER_IMAGE", "codegen-agent-runner:py313")
+        self.is_windows = platform.system() == "Windows"
 
-    @staticmethod
-    def _run(cmd: list[str]) -> subprocess.CompletedProcess:
+    def _run(self, cmd: list[str]) -> subprocess.CompletedProcess:
+        if self.is_windows and cmd[0] == "docker":
+            cmd = ["wsl.exe"] + cmd
+        elif self.is_windows and cmd[0] == "dockerd":
+            cmd = ["wsl.exe"] + cmd
         return subprocess.run(cmd, capture_output=True, text=True)
 
     def ensure_docker(self) -> None:

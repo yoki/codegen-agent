@@ -57,7 +57,7 @@ GEMINI_API_KEY_FOR_CODEGEN_AGENT=your_gemini_api_key_here
 2. `./env` (current directory)
 3. `/secrets/codegen_agent/.env` (Docker/devcontainer)
 4. `~/.config/codegen-agent/.env` (Linux/WSL)
-5. `%LOCALAPPDATA%\codegen_agent\State\.env` (Windows)
+5. `%LOCALAPPDATA%\codegen_agent\codegen_agent\.env` (Windows)
 
 ```json
     "mounts": [
