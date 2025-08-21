@@ -45,6 +45,21 @@ class DockerRuntime:
             time.sleep(1)
             timeout -= 1
 
+    def _normalize_path(self, path: str) -> str:
+        resolved_path = Path(path).resolve()
+
+        if self.is_windows:
+            # Convert Windows path to format that works in all shells
+            path_str = str(resolved_path)
+            # Convert C:\path\to\dir to /c/path/to/dir for Git Bash compatibility
+            if path_str[1:3] == ":\\":
+                drive = path_str[0].lower()
+                rest = path_str[3:].replace("\\", "/")
+                return f"/mnt/{drive}/{rest}"
+            return path_str.replace("\\", "/")
+        else:
+            return str(resolved_path)
+
     def ensure_image(self) -> None:
         self.ensure_docker()
         # Fast path: image already present.
@@ -85,9 +100,9 @@ class DockerRuntime:
             "run",
             "--rm",
             "-v",
-            f"{Path(inputs_dir).resolve()}:/inputs:ro",
+            f"{self._normalize_path(inputs_dir)}:/inputs:ro",
             "-v",
-            f"{Path(outputs_dir).resolve()}:/outputs:rw",
+            f"{self._normalize_path(outputs_dir)}:/outputs:rw",
             self.image,
             "python",
             "-u",
