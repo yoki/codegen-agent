@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Optional
 import time
 import platform
+from importlib.resources import files
+import tempfile
 
 
 class DockerRuntime:
@@ -43,7 +45,7 @@ class DockerRuntime:
             time.sleep(1)
             timeout -= 1
 
-    def ensure_image(self, dockerfile: Optional[str] = None) -> None:
+    def ensure_image(self) -> None:
         self.ensure_docker()
         # Fast path: image already present.
         insp = self._run(["docker", "image", "inspect", self.image])
@@ -54,23 +56,26 @@ class DockerRuntime:
         print(f"Docker image '{self.image}' not found, building...")
 
         # Use the external Dockerfile.runner by default
-        if dockerfile is None:
-            dockerfile = "/workspaces/codegen-agent/sandbox/Dockerfile.runner"
+        dockerfile_content = files("codegen_agent").joinpath("sandbox/Dockerfile.runner").read_text(encoding="utf-8")
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".dockerfile", delete=False) as tmp_dockerfile:
+            tmp_dockerfile.write(dockerfile_content)
+            tmp_dockerfile_path = tmp_dockerfile.name
 
-        df_path = Path(dockerfile)
-        context_dir = str(df_path.parent)
-        cmd = ["docker", "build", "-t", self.image, "-f", str(df_path), context_dir]
-        proc = self._run(cmd)
-        if proc.returncode != 0:
-            msg = [
-                "Failed to build sandbox image.",
-                f"Command: {' '.join(cmd)}",
-                f"Return code: {proc.returncode}",
-                f"STDOUT:\n{proc.stdout.strip()}",
-                f"STDERR:\n{proc.stderr.strip()}",
-            ]
-            raise RuntimeError("\n".join(msg))
-        print(f"Successfully built image '{self.image}' from {dockerfile}")
+        try:
+            cmd = ["docker", "build", "-t", self.image, "-f", tmp_dockerfile_path, "."]
+            proc = self._run(cmd)
+            if proc.returncode != 0:
+                msg = [
+                    "Failed to build sandbox image.",
+                    f"Command: {' '.join(cmd)}",
+                    f"Return code: {proc.returncode}",
+                    f"STDOUT:\n{proc.stdout.strip()}",
+                    f"STDERR:\n{proc.stderr.strip()}",
+                ]
+                raise RuntimeError("\n".join(msg))
+            print(f"Successfully built image '{self.image}'")
+        finally:
+            Path(tmp_dockerfile_path).unlink(missing_ok=True)
 
     def run(self, inputs_dir: str, outputs_dir: str) -> subprocess.CompletedProcess:
         self.ensure_docker()
