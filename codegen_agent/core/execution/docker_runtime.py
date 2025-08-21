@@ -57,9 +57,9 @@ class DockerRuntime:
 
         # Use the external Dockerfile.runner by default
         dockerfile_content = files("codegen_agent").joinpath("sandbox/Dockerfile.runner").read_text(encoding="utf-8")
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".dockerfile", delete=False) as tmp_dockerfile:
-            tmp_dockerfile.write(dockerfile_content)
-            tmp_dockerfile_path = tmp_dockerfile.name
+        tmp_dockerfile_path = "./tmp_dockerfile"
+        with open(tmp_dockerfile_path, "w") as f:
+            f.write(dockerfile_content)
 
         try:
             cmd = ["docker", "build", "-t", self.image, "-f", tmp_dockerfile_path, "."]
